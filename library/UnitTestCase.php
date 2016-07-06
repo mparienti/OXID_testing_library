@@ -150,7 +150,8 @@ abstract class UnitTestCase extends BaseTestCase
         $reportingLevel = (int) getenv('TRAVIS_ERROR_LEVEL');
         error_reporting($reportingLevel ? $reportingLevel : ((E_ALL ^ E_NOTICE) | E_STRICT));
 
-        $this->dbObjectBackup = $this->getProtectedClassProperty(Database::getInstance(), 'db');
+        $this->dbObjectBackup = oxDb::getDbObject();
+        #$this->dbObjectBackup = $this->getProtectedClassProperty(Database::getInstance(), 'db');
         $this->dbQueryBuffer = array();
 
         $this->setShopId(null);
@@ -180,10 +181,8 @@ abstract class UnitTestCase extends BaseTestCase
      */
     protected function tearDown()
     {
-        #oxDb::setDbObject($this->dbObjectBackup);
-
-        $this->setProtectedClassProperty(Database::getInstance(), 'db', $this->dbObjectBackup);
-        Database::getDb()->closeConnection();
+        oxDb::setDbObject($this->dbObjectBackup);
+        #$this->setProtectedClassProperty(Database::getInstance(), 'db', $this->dbObjectBackup);
 
         if ($this->getResult() === null) {
             $this->cleanUpDatabase();
@@ -212,7 +211,6 @@ abstract class UnitTestCase extends BaseTestCase
         self::getShopStateBackup()->resetStaticVariables();
         $dbRestore = self::_getDbRestore();
         $dbRestore->restoreDB();
-        Database::getDb()->closeConnection();
     }
 
     /**
