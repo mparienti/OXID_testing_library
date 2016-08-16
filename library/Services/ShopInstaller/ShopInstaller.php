@@ -154,7 +154,8 @@ class ShopInstaller implements ShopServiceInterface
         $dbHandler->query('create database `' . $dbHandler->getDbName() . '` collate ' . $dbHandler->getCharsetMode() . '_general_ci');
         $sSetupPath = $this->getSetupDirectory();
         $suffix = $this->getServiceConfig()->getEditionSufix();
-        $dbHandler->import($sSetupPath . "/sql$suffix/database.sql", 'latin1');
+        $dbHandler->import($sSetupPath . "/sql$suffix/database_schema.sql", 'latin1');
+        $dbHandler->import($sSetupPath . "/sql$suffix/initial_data.sql", 'latin1');
     }
 
     /**
