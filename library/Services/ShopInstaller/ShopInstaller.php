@@ -122,7 +122,8 @@ class ShopInstaller implements ShopServiceInterface
 
         $dbHandler->query('drop database `' . $dbHandler->getDbName() . '`');
         $dbHandler->query('create database `' . $dbHandler->getDbName() . '` collate ' . $dbHandler->getCharsetMode() . '_general_ci');
-        $dbHandler->import($this->getEditionPathProvider()->getDatabaseSqlDirectory() . "/database.sql", 'latin1');
+        $dbHandler->import($this->getEditionPathProvider()->getDatabaseSqlDirectory() . "/database_schema.sql", 'latin1');
+        $dbHandler->import($this->getEditionPathProvider()->getDatabaseSqlDirectory() . "/initial_data.sql", 'utf8');
     }
 
     /**
