@@ -1,0 +1,84 @@
+#!/usr/bin/env php
+<?php
+/**
+ * This file is part of OXID eSales Testing Library.
+ *
+ * OXID eSales Testing Library is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * OXID eSales Testing Library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with OXID eSales Testing Library. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @link http://www.oxid-esales.com
+ * @copyright (C) OXID eSales AG 2003-2016
+ */
+
+require_once __DIR__ .'/../base.php';
+
+$testConfig = new OxidEsales\TestingLibrary\TestConfig();
+
+$arguments = array();
+array_shift($argv);
+foreach ($argv as $argument) {
+    $arguments[] = (strpos($argument, '-') === 0) ? $argument : escapeshellarg($argument);
+}
+
+$php = getenv('PHPBIN') ? getenv('PHPBIN') : 'php';
+
+$codec = $testConfig->getVendorDirectory() ."/bin/codecept";
+if (!file_exists($codec)) {
+    $codec = "codecept";
+}
+###$codec = "$php $codec run functional";
+
+$codec = "$php $codec run -c /var/www/oxideshop/tests/Functional ";
+
+# $arguments = empty($arguments) ? array(escapeshellarg('functional')) : $arguments;
+
+$returnCode = 0;
+
+# if (end($arguments) == escapeshellarg('AllTestsFunctional')) {
+#     $testSuites = $testConfig->getTestSuites();
+#     foreach ($testSuites as $suite) {
+#         $suiteReturnCode = runSuite($suite, $codec, $arguments);
+#         $returnCode = $returnCode == 0 ? $suiteReturnCode : $returnCode;
+#     }
+# } else {
+#     $suite = $testConfig->getCurrentTestSuite();
+#     $returnCode = runSuite($suite, $codec, $arguments);
+# }
+
+passthru($codec);
+
+exit($returnCode);
+
+/**
+ * Runs test suite.
+ *
+ * @param string $suite     Suite path.
+ * @param string $codec     Codeception run command.
+ * @param array  $arguments arguments to pass to PHPUnit.
+ *
+ * @return int Error code.
+ */
+function runSuite($suite, $codec, $arguments)
+{
+    $configuration = '';
+    if (file_exists($suite ."/phpunit.xml")) {
+        $configuration = "-c ". escapeshellarg("$suite/phpunit.xml");
+    }
+
+    $arguments = implode(' ', $arguments);
+    $return = 0;
+    $suite = escapeshellarg($suite);
+    passthru("TEST_SUITE=$suite $codec $configuration $arguments", $return);
+
+    return $return;
+}
