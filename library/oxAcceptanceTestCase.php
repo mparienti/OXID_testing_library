@@ -1,4 +1,4 @@
-M<?php
+<?php
 /**
  * This file is part of OXID eSales Testing Library.
  *
