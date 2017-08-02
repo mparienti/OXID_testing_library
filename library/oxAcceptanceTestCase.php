@@ -1,4 +1,4 @@
-<?php
+M<?php
 /**
  * This file is part of OXID eSales Testing Library.
  *
@@ -70,7 +70,7 @@ class oxAcceptanceTestCase extends oxMinkWrapper
     private $selectedWindow = null;
 
     /** @var string Currently used mink driver. */
-    private $currentMinkDriver = '';
+    protected $currentMinkDriver = '';
 
     /** @var int How many retry times are left. */
     private $retryTimesLeft;

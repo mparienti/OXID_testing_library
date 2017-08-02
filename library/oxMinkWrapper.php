@@ -96,7 +96,12 @@ class oxMinkWrapper extends oxBaseTestCase
     public function windowMaximize()
     {
 //        $this->getMinkSession()->getDriver()->getWebDriverSession()->window('current')->maximize();
-        $this->getMinkSession()->getDriver()->getBrowser()->windowMaximize();
+        if ($this->currentMinkDriver == 'selenium2') {
+            //$this->getMinkSession()->getDriver()->windowMaximize();
+        } else {
+            $this->getMinkSession()->getDriver()->getBrowser()->windowMaximize();
+        }
+
     }
 
     /**
@@ -105,7 +110,11 @@ class oxMinkWrapper extends oxBaseTestCase
      */
     public function openWindow($sUrl, $sId)
     {
-        $this->getMinkSession()->getDriver()->getBrowser()->openWindow($sUrl, $sId);
+        if ($this->currentMinkDriver == 'selenium2') {
+            $this->getMinkSession()->visit($sUrl);
+        } else {
+            $this->getMinkSession()->getDriver()->getBrowser()->openWindow($sUrl, $sId);
+        }
     }
 
     /**
@@ -193,6 +202,18 @@ class oxMinkWrapper extends oxBaseTestCase
         $this->fireEvent($sSelector, 'change');
     }
 
+    /**
+     *
+     */
+    public function executeScript($script)
+    {
+        if ($this->currentMinkDriver == 'selenium2') {
+            $this->getMinkSession()->getDriver()->executeScript($script);
+        } else {
+            $this->getMinkSession()->getDriver()->getBrowser()->getEval($script);
+        }
+    }
+    
     /**
      * Adds selection
      *
@@ -542,10 +563,15 @@ class oxMinkWrapper extends oxBaseTestCase
      */
     public function waitForPageToLoad($iTimeout = 10000, $blCheckIfLoading = false)
     {
-        $readyState = $blCheckIfLoading ? $this->getMinkSession()->getDriver()->getBrowser()->getEval('window.document.readyState') : 'loading';
+        if ($this->currentMinkDriver == 'selenium2') {
+            // WebDriver automatically waits for the page to load
+            // source: https://groups.google.com/forum/#!topic/selenium-users/-fkC2su_b_k
+        } else {
+            $readyState = $blCheckIfLoading ? $this->getMinkSession()->getDriver()->getBrowser()->getEval('window.document.readyState') : 'loading';
 
-        if ($readyState == 'loading' || $readyState == 'interactive') {
-            $this->getMinkSession()->getDriver()->getBrowser()->waitForPageToLoad($iTimeout * $this->_iWaitTimeMultiplier);
+            if ($readyState == 'loading' || $readyState == 'interactive') {
+                $this->getMinkSession()->getDriver()->getBrowser()->waitForPageToLoad($iTimeout * $this->_iWaitTimeMultiplier);
+            }
         }
     }
 
